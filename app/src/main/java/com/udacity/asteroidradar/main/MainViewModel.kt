@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.udacity.asteroidradar.Constants
+import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.NasaApi
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import org.json.JSONObject
@@ -23,7 +24,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun getAsteroidsInfo() {
-        NasaApi.retrofitService.getAsteroids(Constants.API_KEY).enqueue(object: Callback<String> {
+        NasaApi.retrofitAsteroidsService.getAsteroids(Constants.API_KEY).enqueue(object: Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 val asteroidList = parseAsteroidsJsonResult(JSONObject(response.body()!!))
                 _response.value = asteroidList.toString()
@@ -32,7 +33,20 @@ class MainViewModel : ViewModel() {
 
             override fun onFailure(call: Call<String>, t: Throwable) {
                 _response.value = "Failure: ${t.message}"
+                t.message?.let { Log.i("MainVM", it) }
             }
+
+        })
+
+        NasaApi.retrofitPictureService.getPicture(Constants.API_KEY).enqueue(object: Callback<PictureOfDay> {
+            override fun onResponse(call: Call<PictureOfDay>, response: Response<PictureOfDay>) {
+                response.body()?.let { Log.i("MainVM", it.url) }
+            }
+
+            override fun onFailure(call: Call<PictureOfDay>, t: Throwable) {
+                t.message?.let { Log.i("MainVM", it) }
+            }
+
 
         })
     }
