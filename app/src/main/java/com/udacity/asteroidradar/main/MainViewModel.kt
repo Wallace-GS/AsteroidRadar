@@ -27,7 +27,6 @@ class MainViewModel : ViewModel() {
         NasaApi.retrofitAsteroidsService.getAsteroids(Constants.API_KEY).enqueue(object: Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 val asteroidList = parseAsteroidsJsonResult(JSONObject(response.body()!!))
-                _response.value = asteroidList.toString()
                 Log.i("MainVM", asteroidList.toString())
             }
 
@@ -41,6 +40,7 @@ class MainViewModel : ViewModel() {
         NasaApi.retrofitPictureService.getPicture(Constants.API_KEY).enqueue(object: Callback<PictureOfDay> {
             override fun onResponse(call: Call<PictureOfDay>, response: Response<PictureOfDay>) {
                 response.body()?.let { Log.i("MainVM", it.url) }
+                _response.value = response.body()?.url
             }
 
             override fun onFailure(call: Call<PictureOfDay>, t: Throwable) {
